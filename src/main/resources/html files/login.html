@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Aquafin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .login-container {
+            max-width: 400px;
+            margin-top: 100px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            width: 100%;
+            max-width: 200px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container d-flex justify-content-center">
+    <div class="login-container text-center">
+        <img src="/images/aquafin-logo.png" alt="Aquafin" class="logo">
+        <h3 class="mb-4">Login</h3>
+        <form method="post" action="/login">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                <label for="username">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                <label for="password">Password</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Log in</button>
+        </form>
+        <a href="#">Forgot your password?</a>
+    </div>
+</div>
+</body>
+</html>
