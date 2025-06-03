@@ -1,5 +1,4 @@
-// src/main/java/be/ehb/eindproject/controller/LoginController.java
-package be.ehb.eindproject.controller;
+package be.ehb.pp_case2.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LoginController {
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String login() {
         return "login";
     }
 }
