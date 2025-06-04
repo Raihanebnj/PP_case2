@@ -43,20 +43,31 @@
             margin-bottom: 2em;
             border: 1px solid #b1e0d3;
         }
+        pre {
+            background: none;
+            border: none;
+            font-family: inherit;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
 <h1>Overzicht neerslag, risico & voorspelling</h1>
 
+
 <div class="box">
-    <b>Actuele regenvoorspelling:</b>
-    <span th:text="${regenVoorspelling}">Regenvoorspelling wordt geladen...</span>
+    <b>Actuele regenvoorspelling voor Brussel (16 dagen):</b>
+    <pre th:text="${regenVoorspelling}">Regenvoorspelling wordt geladen...</pre>
 </div>
+
 
 <p>
     Aquafin geeft jullie volgende gegevens: het aantal millimeter neerslag per maand sinds 2005.
 </p>
 
+
+<h2>Historische neerslag per maand</h2>
 <table>
     <tr>
         <th>Jaar</th>
@@ -80,7 +91,5 @@
         <td th:text="${data.dec}"></td>
     </tr>
 </table>
-
-
 </body>
 </html>
