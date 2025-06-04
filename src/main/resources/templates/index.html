@@ -1,10 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Overzicht Neerslag en Overstromingsgevaar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2em;
+            background: #f6f8fb;
+        }
+        h1, h2 {
+            color: #0a3d62;
+        }
+        table {
+            border-collapse: collapse;
+            margin-bottom: 2em;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 10px #ddd;
+        }
+        th, td {
+            padding: 0.5em 1em;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #dff9fb;
+        }
+        .alert {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 1em;
+            margin-bottom: 2em;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .box {
+            background: #d1f2eb;
+            border-radius: 5px;
+            padding: 1em;
+            margin-bottom: 2em;
+            border: 1px solid #b1e0d3;
+        }
+    </style>
 </head>
 <body>
+<h1>Overzicht neerslag, risico & voorspelling</h1>
+
+<div class="box">
+    <b>Actuele regenvoorspelling:</b>
+    <span th:text="${regenVoorspelling}">Regenvoorspelling wordt geladen...</span>
+</div>
+
+<p>
+    Aquafin geeft jullie volgende gegevens: het aantal millimeter neerslag per maand sinds 2005.
+</p>
+
+<table>
+    <tr>
+        <th>Jaar</th>
+        <th>Jan</th><th>Feb</th><th>Mrt</th><th>Apr</th><th>Mei</th>
+        <th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Okt</th>
+        <th>Nov</th><th>Dec</th>
+    </tr>
+    <tr th:each="data : ${regenData}">
+        <td th:text="${data.jaar}"></td>
+        <td th:text="${data.jan}"></td>
+        <td th:text="${data.feb}"></td>
+        <td th:text="${data.mrt}"></td>
+        <td th:text="${data.apr}"></td>
+        <td th:text="${data.mei}"></td>
+        <td th:text="${data.jun}"></td>
+        <td th:text="${data.jul}"></td>
+        <td th:text="${data.aug}"></td>
+        <td th:text="${data.sep}"></td>
+        <td th:text="${data.okt}"></td>
+        <td th:text="${data.nov}"></td>
+        <td th:text="${data.dec}"></td>
+    </tr>
+</table>
+
 
 </body>
 </html>
