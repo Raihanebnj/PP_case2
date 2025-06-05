@@ -73,7 +73,7 @@ public class WeatherService {
         return grafiekData;
     }
 
-    //  Functie voor groene balk (tekstinfo)
+    //  Functie voor groene balk
     public String getRegenVoorspellingTekst() {
         int dagen = 5;
         Map<String, List<Double>> stadNaarNeerslag = new LinkedHashMap<>();
@@ -128,5 +128,44 @@ public class WeatherService {
         }
 
         return resultaat.toString();
+
     }
+    public Map<String, Object> getOverstromingsWaarschuwing(int dagen) {
+        Map<String, Object> resultaat = new HashMap<>();
+        double drempel = 40.0;
+
+        List<String> risicosteden = new ArrayList<>();
+        Map<String, Double> stadWaarde = new LinkedHashMap<>();
+
+        for (var entry : STEDEN.entrySet()) {
+            String stad = entry.getKey();
+            double[] coords = entry.getValue();
+            String url = String.format(
+                    Locale.US,
+                    "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&daily=precipitation_sum&forecast_days=%d&timezone=auto",
+                    coords[0], coords[1], dagen
+            );
+            RestTemplate restTemplate = new RestTemplate();
+            String response = restTemplate.getForObject(url, String.class);
+            JSONObject json = new JSONObject(response);
+            JSONArray neerslag = json.getJSONObject("daily").getJSONArray("precipitation_sum");
+
+            double som = 0.0;
+            for (int i = 0; i < dagen; i++) {
+                som += neerslag.getDouble(i);
+            }
+            stadWaarde.put(stad, som);
+            if (som >= drempel) {
+                risicosteden.add(stad + " (" + String.format("%.1f", som) + " mm)");
+            }
+        }
+        boolean gevaar = !risicosteden.isEmpty();
+        resultaat.put("gevaar", gevaar);
+        resultaat.put("risicosteden", risicosteden);
+        resultaat.put("drempel", drempel);
+
+        return resultaat;
+    }
+
+
 }

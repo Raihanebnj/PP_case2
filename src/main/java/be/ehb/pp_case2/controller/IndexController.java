@@ -46,19 +46,41 @@ public class IndexController {
             }
             regenData.add(jaarData);
         }
+
+        Map<String, Object> jaar2025 = new LinkedHashMap<>();
+        jaar2025.put("jaar", 2025);
+        jaar2025.put("jan", 65);
+        jaar2025.put("mrt", 68);
+        jaar2025.put("apr", 62);
+        jaar2025.put("feb", 56);
+        jaar2025.put("mei", 80);
+        jaar2025.put("jun", "X");
+        jaar2025.put("jul", "X");
+        jaar2025.put("aug", "X");
+        jaar2025.put("sep", "X");
+        jaar2025.put("okt", "X");
+        jaar2025.put("nov", "X");
+        jaar2025.put("dec", "X");
+        regenData.add(jaar2025);
+
         model.addAttribute("regenData", regenData);
 
-        // Live data voor grafiek én tekst (5 dagen)
+        // Live data voor grafiek én tekst
         int dagen = 5;
         Map<String, Object> grafiekData = weatherService.getGrafiekData(dagen);
-
         model.addAttribute("grafiekDatums", grafiekData.get("datums"));
         model.addAttribute("grafiekGemiddelde", grafiekData.get("gemiddelde"));
         model.addAttribute("grafiekPerStad", grafiekData.get("perStad"));
 
-        // Tekstversie voor groene box
+        // groene box
         String regenVoorspelling = weatherService.getRegenVoorspellingTekst();
         model.addAttribute("regenVoorspelling", regenVoorspelling);
+
+        // Overstromingsgevaar
+        Map<String, Object> waarschuwing = weatherService.getOverstromingsWaarschuwing(3);
+        model.addAttribute("overstromingsgevaar", waarschuwing.get("gevaar"));
+        model.addAttribute("risicosteden", waarschuwing.get("risicosteden"));
+        model.addAttribute("risicoDrempel", String.format("%.1f", waarschuwing.get("drempel")));
 
         return "index";
     }
