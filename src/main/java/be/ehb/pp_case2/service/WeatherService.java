@@ -1,20 +1,14 @@
 package be.ehb.pp_case2.service;
 
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.json.JSONObject;
 import org.json.JSONArray;
-
-
 import java.util.*;
-
 
 @Service
 public class WeatherService {
 
-
-    // Coördinaten van Vlaamse steden
     private static final Map<String, double[]> STEDEN = Map.of(
             "Antwerpen", new double[]{51.22, 4.40},
             "Gent", new double[]{51.05, 3.72},
@@ -28,23 +22,18 @@ public class WeatherService {
             "Sint-Niklaas", new double[]{51.17, 4.14}
     );
 
-
-    public String getRegenVooruitzicht() {
-        int dagen = 5; // aantal dagen vooruit
-        Map<String, List<Double>> stadNaarNeerslag = new LinkedHashMap<>();
+    public Map<String, Object> getGrafiekData(int dagen) {
+        Map<String, List<Double>> neerslagPerStad = new LinkedHashMap<>();
         List<String> datums = new ArrayList<>();
+        int aantalSteden = STEDEN.size();
 
-
-        // RestTemplate aanmaken (voor elke stad)
         RestTemplate restTemplate = new RestTemplate();
 
-
-        // Voor elke stad API-call doen
         for (var entry : STEDEN.entrySet()) {
             String stad = entry.getKey();
             double[] coords = entry.getValue();
             String url = String.format(
-                    Locale.US, // Let op: punt ipv komma
+                    Locale.US,
                     "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&daily=precipitation_sum&forecast_days=%d&timezone=auto",
                     coords[0], coords[1], dagen
             );
@@ -53,16 +42,63 @@ public class WeatherService {
             JSONArray neerslag = json.getJSONObject("daily").getJSONArray("precipitation_sum");
             JSONArray times = json.getJSONObject("daily").getJSONArray("time");
 
-
-            // Haal de datums 1x uit de eerste stad
             if (datums.isEmpty()) {
                 for (int i = 0; i < dagen; i++) {
                     datums.add(times.getString(i));
                 }
             }
 
+            List<Double> waarden = new ArrayList<>();
+            for (int i = 0; i < dagen; i++) {
+                waarden.add(neerslag.getDouble(i));
+            }
+            neerslagPerStad.put(stad, waarden);
+        }
 
-            // Voeg neerslagdata toe voor deze stad
+        // Gemiddelde per dag
+        List<Double> gemiddeldes = new ArrayList<>();
+        for (int dag = 0; dag < dagen; dag++) {
+            double som = 0.0;
+            for (List<Double> waardes : neerslagPerStad.values()) {
+                som += waardes.get(dag);
+            }
+            gemiddeldes.add(som / aantalSteden);
+        }
+
+        Map<String, Object> grafiekData = new HashMap<>();
+        grafiekData.put("datums", datums);
+        grafiekData.put("gemiddelde", gemiddeldes);
+        grafiekData.put("perStad", neerslagPerStad);
+
+        return grafiekData;
+    }
+
+    //  Functie voor groene balk (tekstinfo)
+    public String getRegenVoorspellingTekst() {
+        int dagen = 5;
+        Map<String, List<Double>> stadNaarNeerslag = new LinkedHashMap<>();
+        List<String> datums = new ArrayList<>();
+        RestTemplate restTemplate = new RestTemplate();
+
+        for (var entry : STEDEN.entrySet()) {
+            String stad = entry.getKey();
+            double[] coords = entry.getValue();
+            String url = String.format(
+                    Locale.US,
+                    "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&daily=precipitation_sum&forecast_days=%d&timezone=auto",
+                    coords[0], coords[1], dagen
+            );
+            String response = restTemplate.getForObject(url, String.class);
+            JSONObject json = new JSONObject(response);
+            JSONArray neerslag = json.getJSONObject("daily").getJSONArray("precipitation_sum");
+            JSONArray times = json.getJSONObject("daily").getJSONArray("time");
+
+            if (datums.isEmpty()) {
+                for (int i = 0; i < dagen; i++) {
+                    datums.add(times.getString(i));
+                }
+            }
+
             List<Double> waarden = new ArrayList<>();
             for (int i = 0; i < dagen; i++) {
                 waarden.add(neerslag.getDouble(i));
@@ -70,8 +106,6 @@ public class WeatherService {
             stadNaarNeerslag.put(stad, waarden);
         }
 
-
-        // Bereken dagelijks gemiddelde
         StringBuilder resultaat = new StringBuilder("Gemiddelde voorspelde neerslag voor Vlaanderen (in mm):\n");
         for (int dag = 0; dag < dagen; dag++) {
             double som = 0.0;
@@ -82,8 +116,6 @@ public class WeatherService {
             resultaat.append(String.format("%s: %.1f mm\n", datums.get(dag), gemiddelde));
         }
 
-
-        // (Optioneel: individuele stadswaardes tonen)
         resultaat.append("\nDetails per stad:\n");
         for (String stad : stadNaarNeerslag.keySet()) {
             resultaat.append(stad).append(": ");
@@ -94,7 +126,6 @@ public class WeatherService {
             }
             resultaat.append(" mm\n");
         }
-
 
         return resultaat.toString();
     }
